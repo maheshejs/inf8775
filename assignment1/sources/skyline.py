@@ -19,25 +19,26 @@ class Skyline:
         start_time = time.perf_counter()
         solution = self._algo.solve(buildings)
         end_time = time.perf_counter()
+
         if options['print'] :
             for critical in solution :
                 print(*critical)
+
         if options['time'] :
-            elapsed_time_ms = (end_time - start_time)*1000
+            elapsed_time_ms = (end_time - start_time) * 1000
             print(elapsed_time_ms)
 
 if __name__ == "__main__" :
+    # analyser arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", \
                         help="algorithm to use", \
                         dest="algo", \
                         action='store', required=True)
-
     parser.add_argument("-e", \
                         help="example file with buildings", \
                         dest="example_file", \
                         action='store', required=True, metavar = 'FILE_EXAMPLE')
-
     parser.add_argument("-t", \
                         help="prints elapsed time", \
                         dest="time", \
@@ -46,14 +47,7 @@ if __name__ == "__main__" :
                         help="print solution", \
                         dest="print", \
                         action='store_true')
-
     args = parser.parse_args()
-
-
-    threshold = 25 # arbitraire
-    algos = {'brute':    NaiveAlgo(),
-             'recursif': DCAlgo(),
-             'seuil':    DCThresAlgo(threshold)}
 
     with open(args.example_file, 'r') as f :
         next(f)
@@ -63,5 +57,11 @@ if __name__ == "__main__" :
 
     options = {'print': args.print, 'time': args.time}
 
-    skyline = Skyline(algos[args.algo])
+    threshold = 25                  # arbitraire
+    algo = {'brute':    NaiveAlgo(),
+            'recursif': DCAlgo(),
+            'seuil':    DCThresAlgo(threshold)}[args.algo]
+
+    # resoudre probleme
+    skyline = Skyline(algo)
     skyline.execute_algo(buildings, options)
