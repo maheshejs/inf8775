@@ -75,7 +75,7 @@ class DCAlgo(IDCAlgo) :
     def conquer(self, buildings: List[List[int]]) -> List[List[int]] :
         return [[buildings[0][0], buildings[0][2]], [buildings[0][1], 0]]
 
-# Algorithme Diviser pour regner avec seuil (Divide and Conquer with Threshold)
+# Algorithme Diviser pour Regner avec Seuil (Divide and Conquer with Threshold)
 class DCThresAlgo(IDCAlgo) :
     naive_algo = NaiveAlgo()
     def conquer(self, buildings: List[List[int]]) -> List[List[int]] :
