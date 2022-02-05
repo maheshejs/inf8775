@@ -22,4 +22,4 @@ if [ ! -z "${OPTIONS}" ]; then
   OPTIONS="-${OPTIONS}"
 fi
 
-py ../sources/skyline.py -a $ALGO -e $EXAMPLE_FILE $OPTIONS
+python3 ../sources/skyline.py -a $ALGO -e $EXAMPLE_FILE $OPTIONS
