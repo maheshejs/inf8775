@@ -41,7 +41,7 @@ class NaiveAlgo(IAlgo) :
             x1, x2, height = building
             critical_points.append([x1, height])
             critical_points.append([x2, 0])
-        return critical_points
+        return sorted(critical_points)
 
 # Interface Algorithme Diviser pour Regner (Divide and Conquer)
 class IDCAlgo(IAlgo) :
