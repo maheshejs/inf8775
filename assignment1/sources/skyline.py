@@ -29,7 +29,7 @@ class Skyline:
             print(elapsed_time_ms)
 
 if __name__ == "__main__" :
-    # analyser arguments
+    # parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", \
                         help="algorithm to use", \
@@ -62,6 +62,6 @@ if __name__ == "__main__" :
             'recursif': DCAlgo(),
             'seuil':    DCThresAlgo(threshold)}[args.algo]
 
-    # resoudre probleme
+    # solve skyline problem
     skyline = Skyline(algo)
     skyline.execute_algo(buildings, options)

@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-# Interface Algorithme
+# Interface for algorithm
 class IAlgo(ABC) :
     @abstractmethod
     def solve(self, buildings: List[List[int]]) -> List[List[int]] :
         pass
 
-# Algorithme naif
+# Naive algorithm
 class NaiveAlgo(IAlgo) :
     def solve(self, buildings: List[List[int]]) -> List[List[int]] :
         # Naive algo
@@ -43,7 +43,7 @@ class NaiveAlgo(IAlgo) :
             critical_points.append([x2, 0])
         return sorted(critical_points)
 
-# Interface Algorithme Diviser pour Regner (Divide and Conquer)
+# Interface for Divide and Conquer algorithm
 class IDCAlgo(IAlgo) :
     def __init__(self, threshold: int) -> None: 
         self._threshold = threshold
@@ -68,19 +68,19 @@ class IDCAlgo(IAlgo) :
         critical = None
         
         while idxs[0] != sizes[0] or idxs[1] != sizes[1]:
-            # test pour determiner la moitie qui a le point critique d'abscisse minimum
+            # boolean which tells which half has the critical point of minimal abscissa
             tst = idxs[1] != sizes[1] and \
                     (idxs[0] == sizes[0] or halves[0][idxs[0]][0] > halves[1][idxs[1]][0])
             
-            # retirer le point critique
+            # remove critical point from the half given by the boolean tst
             critical = halves[tst][idxs[tst]]
             idxs[tst] += 1
             heights[tst] = critical[1]
             
-            # surelever le point critique au maximum des hauteurs
+            # update the critical point to the maximum of heights
             critical[1] = max(heights)
             
-            # ajouter le point critique ou non selon qu'il est redondant
+            # verify redundancy before adding the critical point to the solution
             if merge_lst and merge_lst[-1][0] == critical[0] :
                 merge_lst.pop()
             if not merge_lst or merge_lst[-1][1] != critical[1] :
@@ -97,7 +97,7 @@ class IDCAlgo(IAlgo) :
             return self.merge(halves)
             
 
-# Algorithme Diviser pour Regner (Divide and Conquer)
+# Divide and Conquer algorithm
 class DCAlgo(IDCAlgo) :
     def __init__(self) -> None:
         super().__init__(1)
@@ -105,7 +105,7 @@ class DCAlgo(IDCAlgo) :
     def conquer(self, buildings: List[List[int]]) -> List[List[int]] :
         return [[buildings[0][0], buildings[0][2]], [buildings[0][1], 0]]
 
-# Algorithme Diviser pour Regner avec Seuil (Divide and Conquer with Threshold)
+# Divide and Conquer algorithm with threshold
 class DCThresAlgo(IDCAlgo) :
     naive_algo = NaiveAlgo()
     def conquer(self, buildings: List[List[int]]) -> List[List[int]] :
