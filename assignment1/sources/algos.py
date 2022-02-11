@@ -10,8 +10,38 @@ class IAlgo(ABC) :
 # Algorithme naif
 class NaiveAlgo(IAlgo) :
     def solve(self, buildings: List[List[int]]) -> List[List[int]] :
-        # TODO : Ajouter algorithme naif
-        return []
+        # Naive algo
+        solution = []
+        critical_points = self.get_critical_points(buildings)
+        # Loop through critical points
+        for critical_point in critical_points :
+            critical_x, critical_y = critical_point
+
+            # Loop through buildings
+            for building in buildings :
+                x1, x2, height = building
+
+                # Check to see if a point is contained in a building
+                if critical_x >= x1 and critical_x < x2 :
+                    # If the height is superior to the current height of 
+                    # the critical point, update the critical_y
+                    if height > critical_y : 
+                        critical_y = height
+            
+            # If the solution is not empty, verify redundancy with last point of solution
+            # Else, add the point to the solution
+            if not solution or solution[-1][1] != critical_y : 
+                solution.append([critical_x, critical_y])
+        return solution
+    
+    def get_critical_points(self, buildings: List[List[int]]) -> List[List[int]] :
+        critical_points = []
+        # For each building, we mark its critical points
+        for building in buildings : 
+            x1, x2, height = building
+            critical_points.append([x1, height])
+            critical_points.append([x2, 0])
+        return critical_points
 
 # Interface Algorithme Diviser pour Regner (Divide and Conquer)
 class IDCAlgo(IAlgo) :
