@@ -57,7 +57,7 @@ if __name__ == "__main__" :
 
     options = {'print': args.print, 'time': args.time}
 
-    threshold = 20                  # arbitraire
+    threshold = 20
     algo = {'brute':    NaiveAlgo(),
             'recursif': DCAlgo(),
             'seuil':    DCThresAlgo(threshold)}[args.algo]
