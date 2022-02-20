@@ -21,8 +21,10 @@ class NaiveAlgo(IAlgo) :
             for building in buildings :
                 x1, x2, height = building
 
+                if critical_x < x1 :
+                  break
                 # Check to see if a point is contained in a building
-                if critical_x >= x1 and critical_x < x2 :
+                if critical_x < x2 :
                     # If the height is superior to the current height of 
                     # the critical point, update the critical_y
                     if height > critical_y : 
