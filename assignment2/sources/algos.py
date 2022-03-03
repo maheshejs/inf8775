@@ -8,9 +8,12 @@ class IAlgo(ABC) :
     def solve(self, buildings: List[List[int]]) -> List[List[int]] :
         pass
 
+# Greedy algorithm
 class GreedyAlgo(IAlgo):
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
         return []
+
+# Dynamic programming algorithm
 class DynProgAlgo(IAlgo):
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
         blocks.sort(key = lambda x : x[1] * x[2], reverse = True)
@@ -38,6 +41,7 @@ class DynProgAlgo(IAlgo):
 
         return [blocks[idx] for idx in track]
 
+# Tabu search algorithm
 class TabuAlgo(IAlgo):
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
         return []
