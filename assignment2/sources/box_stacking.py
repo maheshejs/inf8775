@@ -1,6 +1,6 @@
 import time
 import argparse
-from algos import IAlgo, GreedyAlgo, DynProgAlgo, TabuAlgo
+from algos import IAlgo, GreedyAlgo, DynProgAlgo, TabuAlgo, compute_height
 from typing import List, Dict
 
 class BoxStacking:
@@ -23,7 +23,7 @@ class BoxStacking:
         if options['print'] :
             for block in solution :
                 print(*block)
-
+            print("Height : ", compute_height(solution))
         if options['time'] :
             elapsed_time_ms = (end_time - start_time) * 1000
             print(elapsed_time_ms)
@@ -49,16 +49,16 @@ if __name__ == "__main__" :
                         action='store_true')
     args = parser.parse_args()
 
-    blocks = list()
+    blocks = []
     with open(args.example_file, 'r') as f :
         for line in f :
-            blocks.append([int(x) for x in line.rstrip().split()])
+            blocks.append(tuple(int(x) for x in line.rstrip().split()))
 
     options = {'print': args.print, 'time': args.time}
 
     algo = {'glouton': GreedyAlgo(),
             'progdyn': DynProgAlgo(),
-            'tabou'  : TabuAlgo()}[args.algo]
+            'tabou'  : TabuAlgo(100, 10)}[args.algo]
 
     # solve box stacking problem
     box_stacking = BoxStacking(algo)
