@@ -41,6 +41,16 @@ class DynProgAlgo(IAlgo):
 
         return [blocks[idx] for idx in track]
 
+class Candidate:
+    greedy_algo = GreedyAlgo()
+    def __init__(self, blocks: List[List[int]]) -> None:
+        self._solution = self.greedy_algo.solve(blocks)
+
+    @property
+    def height(self) -> int :
+        return self._height
+
+
 # Tabu search algorithm
 class TabuAlgo(IAlgo):
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
