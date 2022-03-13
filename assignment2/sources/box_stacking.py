@@ -1,7 +1,8 @@
 import time
 import argparse
-from algos import IAlgo, GreedyAlgo, DynProgAlgo, TabuAlgo, compute_height
+from algos import IAlgo, GreedyAlgo, DynProgAlgo, TabuAlgo
 from typing import List, Dict
+import utils
 
 class BoxStacking:
     def __init__(self, algo: IAlgo) -> None:
@@ -23,7 +24,7 @@ class BoxStacking:
         if options['print'] :
             for block in solution :
                 print(*block)
-            print("Height : ", compute_height(solution))
+            print("Height : ", utils.compute_height(solution))
         if options['time'] :
             elapsed_time_ms = (end_time - start_time) * 1000
             print(elapsed_time_ms)
