@@ -86,28 +86,20 @@ class Candidate:
         return self._tabu
     
     def push(self, block: List[int], update: bool) -> int:
-        insert = min([bisect(self._blocks, block,
+        n = len(self._blocks)
+        end = min([bisect(self._blocks, block,
                               key = lambda x: x[idx+1]) for idx in range(2)])
-
-        upper = deque(self._blocks[insert:])
-        blocks = self._blocks[:insert]
-        blocks.append(block)
-
-        if update :
-          self._tabu = []
-
-        while upper :
-            if upper[0][1] < block[1] and upper[0][2] < block[2] :
+        start = end
+        height = self._height + block[0]
+        while start < n :
+            if self._blocks[start][1] < block[1] and self._blocks[start][2] < block[2] :
                 break
-            else :
-                if update :
-                    self._tabu.append(upper[0])
-                upper.popleft()
-        blocks.extend(upper)
-        height = compute_height(blocks)
+            height -= self._blocks[start][0]
+            start += 1
 
         if update:
-            self._blocks = blocks
+            self._tabu   = self._blocks[end:start]
+            self._blocks = self._blocks[:end] + [block] + self._blocks[start:]
             self._height = height
   
         return height
@@ -143,9 +135,8 @@ class TabuAlgo(IAlgo):
         count = self._max_iter
 
         while count :
-            neighbours = set(blocks) - set(candidate.blocks)
-            for tabu in tabus :
-                neighbours -= set(tabu)
+            neighbours = {*blocks} - {*candidate.blocks} - \
+                         {block for tabu in tabus for block in tabu}
 
             best_height = 0
             best_neighbour = ()
@@ -165,6 +156,6 @@ class TabuAlgo(IAlgo):
             else :
                 count -= 1
         
-            tabus.appendleft(candidate.tabu)
+            tabus.append(candidate.tabu)
         
         return best_candidate.blocks
