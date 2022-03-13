@@ -28,16 +28,7 @@ class IAlgo(ABC) :
 # Greedy algorithm -- TODO : Find a better greedy choice
 class GreedyAlgo(IAlgo):
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
-        blocks.sort(key = lambda x : x[1] * x[2], reverse = True)
-        solution = [blocks[0]]
-        last_idx = 0
-        idx = 1
-        while idx < len(blocks):
-            if blocks[last_idx][1] > blocks[idx][1] and blocks[last_idx][2] > blocks[idx][2] :
-                solution.append(blocks[idx])
-                last_idx = idx
-            idx += 1
-        return solution
+        return []
 
 # Dynamic programming algorithm
 class DynProgAlgo(IAlgo):
