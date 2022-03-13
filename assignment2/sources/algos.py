@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from bisect import bisect
 from typing import List
 from collections import deque
+from bisect import bisect_left
 
 # Interface for algorithm
 class IAlgo(ABC) :
@@ -42,14 +44,33 @@ class DynProgAlgo(IAlgo):
         return [blocks[idx] for idx in track]
 
 class Candidate:
-    greedy_algo = GreedyAlgo()
     def __init__(self, blocks: List[List[int]]) -> None:
-        self._solution = self.greedy_algo.solve(blocks)
+        self._blocks  = DynProgAlgo().solve(blocks)
+        self._height  = 0
+        self._tabu    = []
 
     @property
     def height(self) -> int :
-        return self._height
-
+        heights, *_ = zip(*self._blocks)
+        return sum(heights)
+    
+    @property
+    def tabu(self) -> List[List[int]] :
+        return self._tabu
+    
+    def update(self, block: List[int]) -> None:
+        idxs  = [bisect_left(self._blocks, block, key = lambda x : x[1]),
+                  bisect_left(self._blocks, block, key = lambda x : x[2])]
+        idx   = max(idxs)
+        upper = deque(self._blocks[idx:])
+        self._blocks = self._blocks[:idx]
+        self._blocks.append(block)
+        self._tabu = []
+        while upper :
+            if upper[0][1] >= block[1] or upper[0][2] >= block[2] :
+                self._tabu.append(upper[0])
+                upper.popleft()
+        self._blocks.extend(upper)
 
 # Tabu search algorithm
 class TabuAlgo(IAlgo):
