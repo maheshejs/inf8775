@@ -2,8 +2,10 @@
 from typing import List, Callable
 
 def compute_height(blocks: List[List[int]]) -> int:
-    heights, *_ = zip(*blocks)
-    return sum(heights)
+    if blocks :
+        heights, *_ = zip(*blocks)
+        return sum(heights)
+    return 0
 
 def bisect(lst: List[List[int]], value: List[int], key: Callable[[List[int]], int]) -> int:
     lo = 0
@@ -36,19 +38,19 @@ class Candidate:
     
     def push(self, block: List[int], update: bool) -> int:
         n = len(self._blocks)
-        end = min([bisect(self._blocks, block,
+        start = min([bisect(self._blocks, block,
                               key = lambda x: x[idx+1]) for idx in range(2)])
-        start = end
+        end = start
         height = self._height + block[0]
-        while start < n :
-            if self._blocks[start][1] < block[1] and self._blocks[start][2] < block[2] :
+        while end < n :
+            if self._blocks[end][1] < block[1] and self._blocks[end][2] < block[2] :
                 break
-            height -= self._blocks[start][0]
-            start += 1
+            height -= self._blocks[end][0]
+            end += 1
 
         if update:
-            self._tabu   = self._blocks[end:start]
-            self._blocks = self._blocks[:end] + [block] + self._blocks[start:]
+            self._tabu   = self._blocks[start:end]
+            self._blocks = self._blocks[:start] + [block] + self._blocks[end:]
             self._height = height
   
         return height

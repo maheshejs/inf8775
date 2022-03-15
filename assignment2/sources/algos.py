@@ -3,6 +3,7 @@ from typing import List
 from collections import deque
 from copy import deepcopy
 import utils
+import random
 
 # Interface for algorithm
 class IAlgo(ABC) :
@@ -46,37 +47,30 @@ class DynProgAlgo(IAlgo):
 
 # Tabu search algorithm
 class TabuAlgo(IAlgo):
-    def __init__(self, max_iter: int, tabus_size: int) -> None: 
+    def __init__(self, max_iter: int) -> None: 
         self._max_iter = max_iter
-        self._tabus_size = tabus_size
     
     @property
     def max_iter(self) -> int :
         return self._max_iter
         
-    @property
-    def tabus_size(self) -> int :
-        return self._tabus_size
-        
     @max_iter.setter
     def max_iter(self, max_iter: int) -> None :
         self._max_iter = max_iter
 
-    @tabus_size.setter
-    def tabus_size(self, tabus_size: int) -> None :
-        self._tabus_size = tabus_size
 
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
         greedy_blocks = GreedyAlgo().solve(blocks)
         best_candidate = utils.Candidate(greedy_blocks, utils.compute_height(greedy_blocks))
         candidate = deepcopy(best_candidate)
         
-        tabus = deque(maxlen = self._tabus_size)
+        tabus = tuple(deque(maxlen = size) for size in range(7, 10+1))
+        random.seed(0)
         count = self._max_iter
 
         while count :
             neighbours = {*blocks} - {*candidate.blocks} - \
-                         {block for tabu in tabus for block in tabu}
+                         {block for tabu in tabus for blocks in tabu for block in blocks}
 
             best_height = 0
             best_neighbour = ()
@@ -96,6 +90,6 @@ class TabuAlgo(IAlgo):
             else :
                 count -= 1
         
-            tabus.append(candidate.tabu)
+            random.choice(tabus).append(candidate.tabu)
         
         return best_candidate.blocks
