@@ -24,7 +24,6 @@ class BoxStacking:
         if options['print'] :
             for block in solution :
                 print(*block)
-            print("Height : ", utils.compute_height(solution))
         if options['time'] :
             elapsed_time_ms = (end_time - start_time) * 1000
             print(elapsed_time_ms)
@@ -59,7 +58,7 @@ if __name__ == "__main__" :
 
     algo = {'glouton': GreedyAlgo(),
             'progdyn': DynProgAlgo(),
-            'tabou'  : TabuAlgo(100, 10)}[args.algo]
+            'tabou'  : TabuAlgo(100)}[args.algo]
 
     # solve box stacking problem
     box_stacking = BoxStacking(algo)
