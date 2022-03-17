@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
 from collections import deque
-from copy import deepcopy
 import utils
 import random
 
@@ -62,7 +61,7 @@ class TabuAlgo(IAlgo):
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
         greedy_blocks = GreedyAlgo().solve(blocks)
         best_candidate = utils.Candidate(greedy_blocks, utils.compute_height(greedy_blocks))
-        candidate = deepcopy(best_candidate)
+        candidate = best_candidate
         
         tabus = tuple(deque(maxlen = size) for size in range(7, 10+1))
         random.seed(0)
@@ -85,7 +84,7 @@ class TabuAlgo(IAlgo):
 
             candidate.push(best_neighbour, update = True)
             if candidate.height > best_candidate.height :
-                best_candidate = deepcopy(candidate)
+                best_candidate = candidate
                 count = self._max_iter
             else :
                 count -= 1
