@@ -3,14 +3,14 @@ ALGO=""
 EXAMPLE_FILE=""
 OPTIONS=""
 
-while getopts "a:e:pt" FLAG;
+while getopts "a:e:ptx" FLAG; # x is optional to compute maximum height
 do
   case "${FLAG}" in
     a)
       ALGO="${OPTARG}";;
     e) 
       EXAMPLE_FILE="${OPTARG}";;
-    p | t) 
+    p | t | x)
       OPTIONS+="${FLAG}";;
     ?)
       echo "ERROR : Wrong option."

@@ -21,6 +21,8 @@ class BoxStacking:
         solution = self._algo.solve(blocks)
         end_time = time.perf_counter()
 
+        if options['height'] :
+            print(utils.compute_height(solution))
         if options['print'] :
             for block in solution :
                 print(*block)
@@ -47,6 +49,10 @@ if __name__ == "__main__" :
                         help="print solution", \
                         dest="print", \
                         action='store_true')
+    parser.add_argument("-x", \
+                        help="prints maximum height", \
+                        dest="height", \
+                        action='store_true')
     args = parser.parse_args()
 
     blocks = []
@@ -54,7 +60,7 @@ if __name__ == "__main__" :
         for line in f :
             blocks.append(tuple(int(x) for x in line.rstrip().split()))
 
-    options = {'print': args.print, 'time': args.time}
+    options = {'print': args.print, 'time': args.time, 'height': args.height}
 
     algo = {'glouton': GreedyAlgo(),
             'progdyn': DynProgAlgo(),

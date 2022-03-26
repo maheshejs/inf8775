@@ -11,10 +11,19 @@ class IAlgo(ABC) :
     def solve(self, buildings: List[List[int]]) -> List[List[int]] :
         pass
 
-# Greedy algorithm -- TODO : Find a better greedy choice
+# Greedy algorithm
 class GreedyAlgo(IAlgo):
     def solve(self, blocks: List[List[int]]) -> List[List[int]] :
-        return []
+        blocks.sort(key = lambda x : x[0] + x[1] * x[2], reverse = True)
+        greedy_blocks = [blocks[0]]
+        last_idx = 0
+        idx = 1
+        while idx < len(blocks):
+            if blocks[last_idx][1] > blocks[idx][1] and blocks[last_idx][2] > blocks[idx][2] :
+                greedy_blocks.append(blocks[idx])
+                last_idx = idx
+            idx += 1
+        return greedy_blocks
 
 # Dynamic programming algorithm
 class DynProgAlgo(IAlgo):
@@ -80,8 +89,10 @@ class TabuAlgo(IAlgo):
                     best_height = height
                     best_neighbour = neighbour
             
-            if best_height == 0 :
-                break
+            if not neighbours:
+                for tabu in tabus :
+                    tabu.popleft()
+                pass
 
             candidate.push(best_neighbour, update = True)
             if candidate.height > best_candidate.height :
