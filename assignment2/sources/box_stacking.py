@@ -26,6 +26,7 @@ class BoxStacking:
         if options['print'] :
             for block in solution :
                 print(*block)
+        # This is optional
         if options['time'] :
             elapsed_time_ms = (end_time - start_time) * 1000
             print(elapsed_time_ms)
@@ -55,6 +56,7 @@ if __name__ == "__main__" :
                         action='store_true')
     args = parser.parse_args()
 
+    # read blocks in file
     blocks = []
     with open(args.example_file, 'r') as f :
         for line in f :
