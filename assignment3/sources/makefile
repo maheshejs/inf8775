@@ -10,12 +10,12 @@ ODIR = obj
 # Name of file containing cpp main function
 OUT = tp3
 
-# List of depencies (.hpp files) to be added
+# List of depencies (.hpp files), append files as needed
 _DEPS =  
 # Path replacement to access .hpp files to obj include dir
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS)) 
 
-# List of all the object files (.o) 
+# List of all the object files (.o), append files as needed
 _OBJ = $(OUT).o
 # Path replacement to output/access .o file to obj dir
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
