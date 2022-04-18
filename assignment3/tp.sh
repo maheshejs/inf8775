@@ -1,6 +1,6 @@
 #!/bin/bash
 EXAMPLE_FILE=""
-OPTIONS=""
+PRINT_SOL=0
 
 while getopts "e:p" FLAG; 
 do
@@ -8,12 +8,8 @@ do
     e) 
       EXAMPLE_FILE="${OPTARG}";;
     p)
-      OPTIONS+="${FLAG}";;
+      PRINT_SOL=1;;
   esac
 done
 
-if [ ! -z "${OPTIONS}" ]; then
-  OPTIONS="-${OPTIONS}"
-fi
-
-../sources/tp3 -e $EXAMPLE_FILE $OPTIONS
+bin/tp3 $EXAMPLE_FILE $PRINT_SOL

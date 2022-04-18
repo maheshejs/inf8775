@@ -34,7 +34,8 @@ typedef struct Neighbour
 class TabuSearch
 {
 public:
-    explicit TabuSearch(const Input &input, int neighbourhoodSize = 10000, int maxFails = 2500);
+    explicit TabuSearch(const Input &input, bool printSol, 
+                        int neighbourhoodSize = 10000, int maxFails = 2500);
 
     void execute();
 
@@ -66,7 +67,10 @@ private:
     // Solution data
     vector<int> solution_;
     int cost_;
-    double time_;
+
+
+    // Print solution
+    bool printSol_;
 };
 
 #endif

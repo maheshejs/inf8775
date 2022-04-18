@@ -1,12 +1,11 @@
 #include "tabuSearch.h"
 #include <algorithm>
 #include <random>
-#include <cmath>
-#include <fstream>
 
 
-TabuSearch::TabuSearch(const Input &input, int neighbourhoodSize, int maxFails)
-    : dimension_(input.getDimension()), flow_(input.getFlow()), adjacency_(input.getAdjacency()), frequencies_(input.getFrequencies())
+TabuSearch::TabuSearch(const Input &input, bool printSol, int neighbourhoodSize, int maxFails)
+    : printSol_(printSol), dimension_(input.getDimension()), flow_(input.getFlow()), 
+      adjacency_(input.getAdjacency()), frequencies_(input.getFrequencies())
 {
   solution_.resize(dimension_);
 
@@ -44,7 +43,9 @@ void TabuSearch::execute()
   vector<int> currentSolution = solution_;
   int currentCost = cost_;
 
-  // cout << " Tabu search " << endl;
+  /*
+    TABU SEARCH
+  */
   bool isTabu = true;
   while (true)
   {
@@ -107,8 +108,10 @@ void TabuSearch::execute()
         improvement = true;
         solution_ = currentSolution;
         cost_ = currentCost;
-        cout << "\tCost: " << cost_ << endl;
-        printSolution();
+        if (printSol_)
+          printSolution();
+        else
+          cout << currentCost << endl;
       }
 
       // Create tabu move
@@ -136,9 +139,11 @@ void TabuSearch::execute()
         fails++;
         if (fails == maxFails_)
         {
-          fails = 0;
+          /*
+            HILL CLIMBING
+          */
           isTabu = false;
-          // cout << " Random improvement " << endl;
+          // Hill climbing
           currentSolution = solution_;
           currentCost = cost_;
         }
@@ -156,8 +161,10 @@ void TabuSearch::execute()
         solution_ = currentSolution;
         if (currentCost < cost_)
         {
-          cout << "\tCost: " << currentCost << endl;
-          printSolution();
+          if (printSol_)
+            printSolution();
+          else
+            cout << currentCost << endl;
         }
         cost_ = currentCost;
       }
@@ -220,15 +227,12 @@ bool TabuSearch::checkMove(int r, int s, vector<int> &currentSolution)
 
 void TabuSearch::printSolution()
 {
-  ofstream data_w("soln");
   for (int i = 0; i < dimension_; ++i)
   {
     int r = 0;
     int elem = solution_[i];
     while (elem >= frequencies_[r++]);
     cout << r-1 << " ";
-    data_w << r-1 << " ";
   }
   cout << endl;
-  data_w.close();
 }

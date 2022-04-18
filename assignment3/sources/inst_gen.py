@@ -63,20 +63,18 @@ if __name__ == "__main__":
         sec = 1
         comp = []
         pile = [0]
-        connex[0] = 1
         while True:
             while pile:
-                ele = pile.pop(0)
+                ele = pile.pop()
                 comp.append(ele)
+                connex[ele] = 1
                 for j in range(args.taille):
                     if (adj[ele,j] and connex[j] == 0):
-                        connex[j] = 1
                         pile.append(j)
 
             if len(comp) < args.taille:
-                for autre in range(args.taille):
+                for autre in range(sec,args.taille):
                     if connex[autre] == 0:
-                        connex[autre] = 1
                         sec = autre
                         break
                 pre = comp[random.randint(0,len(comp)-1)]
@@ -88,7 +86,7 @@ if __name__ == "__main__":
                 pile.append(sec)
             else:
                 break
-                
+
         # K Types
         K_type = [0]*args.types
         for _ in range(args.taille):
