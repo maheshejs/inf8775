@@ -4,272 +4,235 @@
 #include <cmath>
 #include <fstream>
 
-TabuSearch::TabuSearch(const Input &input, double neighbourhoodSize, int maxEvaluations, int maxFails)
-    : dimension_(input.getDimension()), distances_(input.getDistances()), flow_(input.getFlow()), adjacencies_(input.getAdjacencies())
+
+TabuSearch::TabuSearch(const Input &input, int neighbourhoodSize, int maxFails)
+    : dimension_(input.getDimension()), flow_(input.getFlow()), adjacency_(input.getAdjacency()), frequencies_(input.getFrequencies())
 {
-    solution_.resize(dimension_);
+  solution_.resize(dimension_);
 
-    // Fix parameters
-    neighbourhoodSize_ = neighbourhoodSize;
-    maxEvaluations_ = maxEvaluations;
-    maxFails_ = maxFails;
+  // Fix parameters
+  neighbourhoodSize_ = neighbourhoodSize;
+  maxFails_ = maxFails;
 
-    //Initialize frecuency matrix
-    frec_.resize(dimension_);
-    for (int i = 0; i < frec_.size(); ++i)
-    {
-        frec_[i].resize(dimension_);
-    }
-    execute();
-
+  execute();
 }
 
 void TabuSearch::execute()
 {
 
-    // Randdom
-    std::default_random_engine gen;
-    std::uniform_int_distribution<> dist_int(0, dimension_-1);
-    std::uniform_real_distribution<double> dist_real(0.0,1.0);
+  // Randdom
+  default_random_engine gen;
+  uniform_int_distribution<> dist_int(0, dimension_ - 1);
+  uniform_int_distribution<> dist_bet(0, dimension_/100-1);
+  uniform_real_distribution<double> dist_real(0.0, 1.0);
 
-    // Inner parameters
-    int tabuLength = dimension_ / 10;
-    int fails = 0;
-    bool improvement = false;
-    
-    // Initialize
-    for (int i = 0; i < dimension_; ++i)
-        solution_[i] = i;
+  // Inner parameters
+  int tabuLength = dimension_ / 20;
+  int fails = 0;
+  bool improvement = false;
 
-    // Shuffle vector
-    std::shuffle(solution_.begin(), solution_.end(), gen);
+  // Initialize
+  for (int i = 0; i < dimension_; ++i)
+    solution_[i] = i;
 
-    // Get cost
-    cost_ = calculateCost(solution_);
+  // Shuffle vector
+  shuffle(solution_.begin(), solution_.end(), gen);
 
-    // Current solution and cost
-    vector<int>currentSolution;
-    currentSolution = solution_;
-    int currentCost = cost_;
+  // Get cost
+  cost_ = calculateCost(solution_);
 
-    double T = 100;
+  // Current solution and cost
+  vector<int> currentSolution = solution_;
+  int currentCost = cost_;
 
-    cout << " Tabu search " << endl;
-    bool isTabu = true;
-    ofstream data_w("soln");
-    while(true)
+  // cout << " Tabu search " << endl;
+  bool isTabu = true;
+  while (true)
+  {
+    if (isTabu)
     {
-        if (isTabu)
-        {
-        improvement = false;
-        /*
-        */
+      improvement = false;
 
-        
-        // Empty the neighborhoud
-        priority_queue<Neighbour, vector<Neighbour>, greater<Neighbour>> neighbourhood;
+      // Empty the neighborhoud
+      priority_queue<Neighbour, vector<Neighbour>, greater<Neighbour>> neighbourhood;
 
-        // Generate the Neighbourhood
- 	    //for(int r = 0; r < dimension_-1; r++)
-      //{
-        //for(int s = r+1; s < dimension_; s++)
-        for (int i = 0; i < 10000; ++i)
-        {
-            // Generate random r and s
-            //int r = rand() % dimension_;
-            //int s = rand() % dimension_;
-            int r = dist_int(gen);
-            int s = dist_int(gen);
+      // Generate the Neighbourhood
+      vector<int> neigh_guy;
+      neigh_guy.resize(100);
+      int sample_guy = dist_bet(gen);
+      for (int i = 0; i < 100; ++i)
+      {
+          neigh_guy[i] = (dimension_/100) * i + sample_guy;
+      }
 
-            // Add to the neighbourhood
-            Neighbour neighbour;
-            neighbour.r = r;
-            neighbour.s = s;
-            neighbour.cost = currentCost + moveCost(currentSolution, r, s);
+      for (int rt = 0; rt < 100-1; ++rt)
+      {
+      for (int st = rt+1; st < 100; ++st)
+      //for (int i = 0; i < neighbourhoodSize_; ++i)
+      {
+        // Generate random r and s
+        //int r = dist_int(gen);
+        //int s = dist_int(gen);
+        int r = neigh_guy[rt];
+        int s = neigh_guy[st];
 
-            neighbourhood.push(neighbour);
-        }
-      //}
+        // Add to the neighbourhood
+        Neighbour neighbour;
+        neighbour.r = r;
+        neighbour.s = s;
+        neighbour.cost = currentCost + moveCost(currentSolution, r, s);
 
+        neighbourhood.push(neighbour);
+      }
+      }
 
-        // Check if the move is not Tabu
-        bool selected = false;
-        Neighbour best_neigh = neighbourhood.top();
-        selected = checkMove(best_neigh.r, best_neigh.s, currentSolution);
+      // Check if the move is not Tabu
+      bool selected = false;
+      Neighbour best_neigh = neighbourhood.top();
+      selected = checkMove(best_neigh.r, best_neigh.s, currentSolution);
 
-        // Check if is better than our solution
-        if (!selected && best_neigh.cost < cost_)
-        {
-            selected = true;
-        }
-        
+      // Check if is better than our solution
+      if (!selected && best_neigh.cost < cost_)
+      {
+        selected = true;
+      }
+
+      neighbourhood.pop();
+      while (!selected && !neighbourhood.empty())
+      {
+        best_neigh = neighbourhood.top();
+        if (best_neigh.cost != currentCost)
+          selected = checkMove(best_neigh.r, best_neigh.s, currentSolution);
         neighbourhood.pop();
-        while (!selected &&  !neighbourhood.empty())
+      }
+
+      // If none of the neighbourhood is selected, generate new neighbourhood
+      if (!selected)
+        continue;
+
+      int r = best_neigh.r;
+      int s = best_neigh.s;
+
+      // Jump to something
+      swap(currentSolution[r], currentSolution[s]);
+      currentCost = best_neigh.cost;
+
+      if (currentCost < cost_)
+      {
+        improvement = true;
+        solution_ = currentSolution;
+        cost_ = currentCost;
+        cout << "\tCost: " << cost_ << endl;
+      }
+
+      // Create tabu move
+      TabuMove tabuMove;
+      tabuMove.posI = currentSolution[r];
+      tabuMove.posJ = currentSolution[s];
+      tabuMove.i = r;
+      tabuMove.j = s;
+
+      // Add tabu move
+      tabuList_.push_back(tabuMove);
+
+      // Size of the deque
+      if (tabuList_.size() > tabuLength)
+      {
+        tabuList_.pop_front();
+      }
+
+      if (improvement)
+      {
+        fails = 0;
+      }
+      else
+      {
+        fails++;
+        if (fails == maxFails_)
         {
-            best_neigh = neighbourhood.top();
-            if (best_neigh.cost != currentCost)
-                selected = checkMove(best_neigh.r, best_neigh.s, currentSolution);
-            neighbourhood.pop();
+          fails = 0;
+          isTabu = false;
+          // cout << " Random improvement " << endl;
+          currentSolution = solution_;
+          currentCost = cost_;
         }
-
-        // If none of the neighbourhood is selected, generate new neighbourhood
-        if (!selected)
-            continue;
-      
-
-        int r =  best_neigh.r;
-        int s =  best_neigh.s;
-
-        // Jump to something
-        std::swap(currentSolution[r], currentSolution[s]);
-        currentCost = best_neigh.cost;
-        
-        if (currentCost < cost_)
-        {
-            improvement = true;
-            solution_ = currentSolution;
-            cost_ = currentCost;
-            cout << "\tCost: " << cost_ << endl;
-        }
-
-        // Create tabu move
-        TabuMove tabuMove;
-        tabuMove.posI = currentSolution[r];
-        tabuMove.posJ = currentSolution[s];
-        tabuMove.i = r;
-        tabuMove.j = s;
-
-        // Add tabu move
-        tabuList_.push_back(tabuMove);
-
-        //Size of the deque
-        if (tabuList_.size() > tabuLength)
-        {
-            tabuList_.pop_front();
-        }
-
-        if (improvement)
-        {
-            fails = 0;
-        }
-        else
-        {
-            fails ++;
-            if (fails == 2500)
-            {
-                isTabu = false;
-                cout << " Simulated annealing " << endl;
-                currentSolution = solution_;
-                currentCost = cost_;
-            }
-        }
+      }
     }
     else
     {
-        int r = dist_int(gen);
-        int s = dist_int(gen);
+      int r = dist_int(gen);
+      int s = dist_int(gen);
 
-        double p = dist_real(gen);
-
-        currentCost = cost_ + moveCost(currentSolution, r, s);
-
-        if (currentCost < cost_)
-        {
-            std::swap(currentSolution[r], currentSolution[s]);
-            solution_ = currentSolution;
-            cost_ = currentCost;
-            cout << "\tCost: " << cost_ << endl;
-            /*
-            if (cost_ == 311241)
-            {
-            for (int i = 0; i < solution_.size(); ++i)
-            {
-                data_w << solution_[i] << " ";
-                cout << solution_[i] << " ";
-            }
-            data_w.close();
-            cout << "End of the line" << endl;
-            }*/
-        }
-
-        T *= 0.95;
+      currentCost = cost_ + moveCost(currentSolution, r, s);
+      if (currentCost < cost_)
+      {
+        swap(currentSolution[r], currentSolution[s]);
+        solution_ = currentSolution;
+        cost_ = currentCost;
+        cout << "\tCost: " << cost_ << endl;
+      }
     }
-    }
+  }
 }
 
 int TabuSearch::moveCost(vector<int> &oldSolution, int r, int s)
 {
-    int cost = 0;
-    for (int k : adjacencies_[r])
-        if (k != s)
-            cost += flow_[oldSolution[s]][oldSolution[k]] - flow_[oldSolution[r]][oldSolution[k]];
-    
-    for (int k : adjacencies_[s])
-        if (k != r)
-            cost += flow_[oldSolution[r]][oldSolution[k]] - flow_[oldSolution[s]][oldSolution[k]];
+  int cost = 0;
+  for (int k : adjacency_[r])
+    if (k != s)
+      cost += flow_[oldSolution[s]][oldSolution[k]] - flow_[oldSolution[r]][oldSolution[k]];
 
-    return cost;
+  for (int k : adjacency_[s])
+    if (k != r)
+      cost += flow_[oldSolution[r]][oldSolution[k]] - flow_[oldSolution[s]][oldSolution[k]];
+
+  return cost;
 }
 
 int TabuSearch::calculateCost(vector<int> &solution)
 {
-    int cost = 0;
-    for (int i = 0; i < dimension_; ++i)
-        for (int k : adjacencies_[i])
-            cost += flow_[solution[i]][solution[k]];
+  int cost = 0;
+  for (int i = 0; i < dimension_; ++i)
+    for (int k : adjacency_[i])
+      cost += flow_[solution[i]][solution[k]];
 
-    return cost/2;
+  return cost >> 1;
 }
 
 // Search in the Tabu Moves if the move r,s is allowed with the vector current solution
 bool TabuSearch::checkMove(int r, int s, vector<int> &currentSolution)
 {
-    for (int n = 0; n < tabuList_.size(); ++n)
+  for (int n = 0; n < tabuList_.size(); ++n)
+  {
+    if ((tabuList_[n].i == r && tabuList_[n].posI == currentSolution[r]))
     {
-        /*
-        if ((tabuList_[n].i == r && tabuList_[n].j == s ))
-        {
-            return false;
-        }
-
-        if ((tabuList_[n].i == s && tabuList_[n].j == r ))
-        {
-            return false;
-        }*/
-
-        
-        if ((tabuList_[n].i == r && tabuList_[n].posI == currentSolution[r] ))
-        {
-            return false;
-        }
-
-        if ((tabuList_[n].i == s && tabuList_[n].posI == currentSolution[s] ))
-        {
-            return false;
-        }
-      
-        if ((tabuList_[n].j == r && tabuList_[n].posJ == currentSolution[r] ))
-        {
-            return false;
-        }
-
-        if ((tabuList_[n].j == s && tabuList_[n].posJ == currentSolution[s] ))
-        {
-            return false;
-        }
+      return false;
     }
 
-    return true;
+    if ((tabuList_[n].i == s && tabuList_[n].posI == currentSolution[s]))
+    {
+      return false;
+    }
+
+    if ((tabuList_[n].j == r && tabuList_[n].posJ == currentSolution[r]))
+    {
+      return false;
+    }
+
+    if ((tabuList_[n].j == s && tabuList_[n].posJ == currentSolution[s]))
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
-vector<int> TabuSearch::getSolution()
+void TabuSearch::printSolution()
 {
-    return solution_;
+  int r = 0;
+  for (int i = 0; i < dimension_; ++i)
+    while (solution_[i] < frequencies_[r])
+        cout << r++ << " ";
+  cout << endl;
 }
-
-int TabuSearch::getCost()
-{
-    return cost_;
-}
-
-

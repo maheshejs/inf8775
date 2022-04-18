@@ -13,19 +13,21 @@ public:
 
     string getFilename() const;
     int getDimension() const;
+    int getType() const;
 
-    vector< vector<int> > getDistances() const;
     vector< vector<int> > getFlow() const;
-    map< int, vector<int> > getAdjacencies() const;
+    vector< int > getFrequencies() const;
+    map< int, vector<int> > getAdjacency() const;
 
 
 
 private:
     string filename_;
     int dimension_;
-    vector< vector<int> > distances_;
+    int type_;
     vector< vector<int> > flow_;
-    map< int, vector<int> > adjacencies_;
+    map< int, vector<int> > adjacency_;
+    vector< int > frequencies_;
 };
 
 #endif

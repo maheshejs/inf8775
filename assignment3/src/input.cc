@@ -20,72 +20,53 @@ bool Input::read()
     data >> dimension_;
     
     // 
-    int K, E;
-    data >> K >> E;
+    int K, edges;
+    data >> K >> edges;
     
-    int frequencies[K] = {0};
-    data >> frequencies[0]; 
+    type_ = K;
+    frequencies_.resize(type_);
+    data >> frequencies_[0]; 
     for (int i = 1; i < K; ++i)
     {
       int a;
       data >> a;
-      frequencies[i] = a + frequencies[i-1]; 
+      frequencies_[i] = a + frequencies_[i-1]; 
     }
+
 
     int energies[K][K] = {{0}};
     for (int i = 0; i < K; ++i)
       for (int j = 0; j < K; ++j)
         data >> energies[i][j];
     
-    // Initialize distance and flow matrix
-    distances_.resize(dimension_);
-    for (int i = 0; i < dimension_; ++i)
-    {
-        distances_[i].resize(dimension_);
-    }
+    // Initialize flow matrix
 
     flow_.resize(dimension_);
     for (int i = 0; i < dimension_; ++i)
-    {
         flow_[i].resize(dimension_);
-    }
 
     //Fill flows
     int r = 0;
     for (int i = 0; i < dimension_; ++i)
     {
-        if (i == frequencies[r])
-        {
+        if (i == frequencies_[r])
           r++;
-        }
 
         int s = 0;
         for (int j = 0; j < dimension_; ++j)
         {
-            if (j == frequencies[s])
-            {
+            if (j == frequencies_[s])
               s++;
-            }
             flow_[i][j] = energies[r][s];
         }
     }
 
-    // Fill distances
-    for (int i = 0; i < dimension_; i++)
-    {
-        for (int j = 0; j < dimension_; ++j)
-        {
-            distances_[i][j] = 0;
-        }
-    }
-
+    // Fill adjacency list
     int a, b;
     while (data >> a >> b)
     {
-        adjacencies_[a].push_back(b);
-        adjacencies_[b].push_back(a);
-        distances_[a][b] = 1;
-        distances_[b][a] = 1;
+        adjacency_[a].push_back(b);
+        adjacency_[b].push_back(a);
     }
 
     return true;
@@ -96,9 +77,9 @@ int Input::getDimension() const
     return dimension_;
 }
 
-vector< vector<int> > Input::getDistances() const
+int Input::getType() const
 {
-    return distances_;
+    return type_;
 }
 
 vector< vector<int> > Input::getFlow() const
@@ -106,7 +87,12 @@ vector< vector<int> > Input::getFlow() const
     return flow_;
 }
 
-map< int, vector<int> > Input::getAdjacencies() const
+vector< int > Input::getFrequencies() const
 {
-    return adjacencies_;
+    return frequencies_;
+}
+
+map< int, vector<int> > Input::getAdjacency() const
+{
+    return adjacency_;
 }

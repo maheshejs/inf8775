@@ -34,12 +34,10 @@ typedef struct Neighbour
 class TabuSearch
 {
 public:
-    explicit TabuSearch(const Input &input, double neighbourhoodSize = 25, int evaluations = 100000, int maxFails = 20);
+    explicit TabuSearch(const Input &input, int neighbourhoodSize = 10000, int maxFails = 2500);
 
     void execute();
 
-    // Simple swap
-    void swap(vector<int> &solution, int r, int s);
     // Factorization
     int moveCost(vector<int> &oldSolution, int r, int s);
     // Calculate cost using objetive function
@@ -48,36 +46,21 @@ public:
     // Tabu Search functions
     bool checkMove(int r, int s, vector<int> &currentSolution);
 
-    // Reset strategies
-    vector<int> diversify();
-    vector<int> intensify();
-    vector<int> useLTMemory();
-
-    // Reset the tabu list
-    void tabuReset(int &tabuLength);
-
-    vector<int> getSolution();
-    int getCost();
+    void printSolution();
 
 private:
     // Input data
     int dimension_;
-    map< int, vector<int> > adjacencies_;
+    map< int, vector<int> > adjacency_;
     vector< vector<int> > distances_;
     vector< vector<int> > flow_;
+    vector< int > frequencies_;
 
     // Tabu Moves
     deque<TabuMove> tabuList_;
 
-    // Neighbourhood
-    //vector<Neighbour> neighbourhood_;
-
-    // Frecuency matrix
-    vector<vector<int>> frec_;
-
     // Parameters
     int neighbourhoodSize_;
-    int maxEvaluations_;
     int maxFails_;
 
     // Solution data

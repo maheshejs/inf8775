@@ -21,16 +21,8 @@ int main (int argc, char *argv[])
         return -1;
     }
 
-    // Tabu Search with 100000 evaluations
-    TabuSearch ts(input);
-
-    vector<int> solution =  ts.getSolution();
-    cout << "Tabu Search: " << endl;
-    cout << "\tCostA: " << ts.getCost() << endl;
-    cout << "\tSolution: ";
-    for (int i = 0; i < solution.size(); ++i)
-        cout << solution[i] << " ";
-    cout << endl;
+    // Tabu Search - neighbourhoodSize : 10000 - maxFails : 2500
+    TabuSearch ts(input, 10000, 2500);
 
     return 0;
 }
