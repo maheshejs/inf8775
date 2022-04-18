@@ -23,11 +23,10 @@ void TabuSearch::execute()
   // Randdom
   default_random_engine gen;
   uniform_int_distribution<> dist_int(0, dimension_ - 1);
-  uniform_int_distribution<> dist_bet(0, dimension_/100-1);
   uniform_real_distribution<double> dist_real(0.0, 1.0);
 
   // Inner parameters
-  int tabuLength = dimension_ / 20;
+  int tabuLength = dimension_ > 750 ? dimension_/10 : dimension_/20 ;
   int fails = 0;
   bool improvement = false;
 
@@ -57,24 +56,11 @@ void TabuSearch::execute()
       priority_queue<Neighbour, vector<Neighbour>, greater<Neighbour>> neighbourhood;
 
       // Generate the Neighbourhood
-      vector<int> neigh_guy;
-      neigh_guy.resize(100);
-      int sample_guy = dist_bet(gen);
-      for (int i = 0; i < 100; ++i)
-      {
-          neigh_guy[i] = (dimension_/100) * i + sample_guy;
-      }
-
-      for (int rt = 0; rt < 100-1; ++rt)
-      {
-      for (int st = rt+1; st < 100; ++st)
-      //for (int i = 0; i < neighbourhoodSize_; ++i)
+      for (int i = 0; i < neighbourhoodSize_; ++i)
       {
         // Generate random r and s
-        //int r = dist_int(gen);
-        //int s = dist_int(gen);
-        int r = neigh_guy[rt];
-        int s = neigh_guy[st];
+        int r = dist_int(gen);
+        int s = dist_int(gen);
 
         // Add to the neighbourhood
         Neighbour neighbour;
@@ -83,7 +69,6 @@ void TabuSearch::execute()
         neighbour.cost = currentCost + moveCost(currentSolution, r, s);
 
         neighbourhood.push(neighbour);
-      }
       }
 
       // Check if the move is not Tabu
@@ -123,6 +108,7 @@ void TabuSearch::execute()
         solution_ = currentSolution;
         cost_ = currentCost;
         cout << "\tCost: " << cost_ << endl;
+        printSolution();
       }
 
       // Create tabu move
@@ -164,12 +150,16 @@ void TabuSearch::execute()
       int s = dist_int(gen);
 
       currentCost = cost_ + moveCost(currentSolution, r, s);
-      if (currentCost < cost_)
+      if (currentCost <= cost_)
       {
         swap(currentSolution[r], currentSolution[s]);
         solution_ = currentSolution;
+        if (currentCost < cost_)
+        {
+          cout << "\tCost: " << currentCost << endl;
+          printSolution();
+        }
         cost_ = currentCost;
-        cout << "\tCost: " << cost_ << endl;
       }
     }
   }
@@ -230,9 +220,15 @@ bool TabuSearch::checkMove(int r, int s, vector<int> &currentSolution)
 
 void TabuSearch::printSolution()
 {
-  int r = 0;
+  ofstream data_w("soln");
   for (int i = 0; i < dimension_; ++i)
-    while (solution_[i] < frequencies_[r])
-        cout << r++ << " ";
+  {
+    int r = 0;
+    int elem = solution_[i];
+    while (elem >= frequencies_[r++]);
+    cout << r-1 << " ";
+    data_w << r-1 << " ";
+  }
   cout << endl;
+  data_w.close();
 }
